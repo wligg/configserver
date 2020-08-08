@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        prefer-ip-address: true
+#      配置网关 路由规则
+    gateway:
+      routes:
+        - id: user_route
+#          uri: http://localhost:9999/
+#          lb 代表使用负载均衡，users-server 服务注册中心的服务名
+          uri: lb://users-server
+          predicates:
+            - Path=/user/**
+
+        - id: product8888_route
+#          uri: http://localhost:8888/
+          uri: lb://product-server
+          predicates:
+            - Path=/product/**
+#            开启网关的动态路由
+      discovery:
+        locator:
+          enabled: true
+
+#              开启所有的web端点暴露， 管理路由列表地址- http://localhost:8989/actuator/gateway/routes
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
